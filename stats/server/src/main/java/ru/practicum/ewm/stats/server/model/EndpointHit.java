@@ -2,14 +2,12 @@ package ru.practicum.ewm.stats.server.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "hits")
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class EndpointHit {
