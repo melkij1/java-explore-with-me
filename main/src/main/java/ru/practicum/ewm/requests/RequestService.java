@@ -2,6 +2,7 @@ package ru.practicum.ewm.requests;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.events.Event;
@@ -26,6 +27,7 @@ import static ru.practicum.ewm.requests.enums.RequestStatus.CONFIRMED;
 import static ru.practicum.ewm.requests.enums.RequestStatus.REJECTED;
 import static ru.practicum.ewm.requests.enums.RequestStatus.PENDING;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -61,6 +63,7 @@ public class RequestService {
         } else {
             request.setStatus(CONFIRMED);
         }
+        log.info("Request was created");
         return RequestMapper.toRequestDto(requestRepository.save(request));
     }
 
@@ -95,12 +98,14 @@ public class RequestService {
                 rejected.add(RequestMapper.toRequestDto(request));
             }
         }
+        log.info("Request was updated");
         return new EventRequestStatusUpdateResult(confirmed, rejected);
     }
 
     public RequestDto cancelRequest(Long userId, Long requestId) {
         Request request = requestRepository.findByIdAndRequesterId(requestId, userId);
         request.setStatus(RequestStatus.CANCELED);
+        log.info("Request was canceled");
         return RequestMapper.toRequestDto(requestRepository.save(request));
     }
 
@@ -109,6 +114,7 @@ public class RequestService {
         checkUser(userId);
         eventRepository.findByIdAndInitiatorId(eventId, userId).orElseThrow(() ->
                 new NotFoundException("Event with id=" + eventId + " was not found"));
+        log.info("Request by Event owner");
         return requestRepository.findAllByEventId(eventId).stream()
                 .map(RequestMapper::toRequestDto).collect(Collectors.toList());
     }
@@ -116,6 +122,7 @@ public class RequestService {
     @Transactional(readOnly = true)
     public List<RequestDto> getRequestsByUser(Long userId) {
         checkUser(userId);
+        log.info("Request by User");
         return requestRepository.findAllByRequesterId(userId).stream()
                 .map(RequestMapper::toRequestDto).collect(Collectors.toList());
     }

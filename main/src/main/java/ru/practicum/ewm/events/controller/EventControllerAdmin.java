@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import static ru.practicum.ewm.util.DateConstant.DATE_TIME_PATTERN;
 
+@Slf4j
 @Validated
 @RestController
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ public class EventControllerAdmin {
     @PatchMapping("/{eventId}")
     public EventFullDto updateEventByAdmin(@PathVariable Long eventId,
                                            @RequestBody @Valid EventUpdateAdminDto eventUpdateAdminDto) {
+        log.info("PATCH / /admin/events/{eventId} / updateEventByAdmin");
         return eventService.updateEventByAdmin(eventId, eventUpdateAdminDto);
     }
 
@@ -42,6 +45,7 @@ public class EventControllerAdmin {
                                                               @PositiveOrZero Integer from,
                                                               @RequestParam(value = "size", defaultValue = "10")
                                                               @Positive Integer size) {
+        log.info("GET / /admin/events / getEventsByAdminParams");
         return eventService.getEventsByAdminParams(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 }

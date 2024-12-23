@@ -1,6 +1,7 @@
 package ru.practicum.ewm.categories;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,7 @@ import ru.practicum.ewm.exceptions.NotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -18,31 +20,35 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
+        log.info("Add category: {}", newCategoryDto);
         return CategoryMapper.toCategoryDto(categoryRepository.save(CategoryMapper.toCategory(newCategoryDto)));
     }
 
     public CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto) {
         Category category = getCategory(categoryId);
         category.setName(categoryDto.getName());
+        log.info("Update category: {}", category);
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
     @Transactional(readOnly = true)
     public List<CategoryDto> getAllCategories(Integer from, Integer size) {
+        log.info("Get all categories");
         return categoryRepository.findAll(PageRequest.of(from / size, size)).stream()
                 .map(CategoryMapper::toCategoryDto).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public CategoryDto getCategoryById(Long id) {
+        log.info("Get category by id: {}", id);
         return CategoryMapper.toCategoryDto(getCategory(id));
     }
 
-    public void deleteCategory(Long id) {
-        if (!categoryRepository.existsById(id)) {
-            throw new NotFoundException("Category with id=" + id + " was not found");
+    public void deleteCategory(Long categoryId) {
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new NotFoundException("Category with id=" + categoryId + " was not found");
         }
-        categoryRepository.deleteById(id);
+        categoryRepository.deleteById(categoryId);
     }
 
     private Category getCategory(Long categoryId) {

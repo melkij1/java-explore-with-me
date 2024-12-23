@@ -58,7 +58,7 @@ public class ErrorHandler {
 
     @ExceptionHandler({ValidationException.class, NumberFormatException.class,
             MethodArgumentTypeMismatchException.class, MethodArgumentNotValidException.class,
-            MissingServletRequestParameterException.class, ConstraintViolationException.class})
+            MissingServletRequestParameterException.class, ConstraintViolationException.class, BadRequestException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError badRequest(RuntimeException e) {
         log.error(stackTraceToString(e));

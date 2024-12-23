@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import ru.practicum.ewm.events.dto.EventShortDtoWithViews;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Validated
 @RestController
 @RequiredArgsConstructor
@@ -39,12 +41,14 @@ public class EventControllerPublic {
                                                   @RequestParam(value = "size", defaultValue = "10") @Positive
                                                   Integer size,
                                                   HttpServletRequest request) {
+        log.info("GET / /events / getEvents");
         return eventService.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
                 sort, from, size, request);
     }
 
     @GetMapping("/{eventId}")
     public EventFullDtoWithViews getEventById(@PathVariable Long eventId, HttpServletRequest request) {
+        log.info("GET / /events/{eventId} / getEventById");
         return eventService.getEventById(eventId, request);
     }
 }

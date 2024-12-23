@@ -7,7 +7,7 @@ import jakarta.validation.ValidationException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.apache.coyote.BadRequestException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,6 +23,7 @@ import ru.practicum.ewm.events.dto.*;
 import ru.practicum.ewm.events.enums.State;
 import ru.practicum.ewm.events.enums.StateActionAdmin;
 import ru.practicum.ewm.events.enums.StateActionPrivate;
+import ru.practicum.ewm.exceptions.BadRequestException;
 import ru.practicum.ewm.exceptions.ForbiddenException;
 import ru.practicum.ewm.exceptions.NotFoundException;
 import ru.practicum.ewm.locations.Location;
@@ -51,6 +52,8 @@ import static ru.practicum.ewm.events.enums.StateActionPrivate.CANCEL_REVIEW;
 import static ru.practicum.ewm.events.enums.StateActionPrivate.SEND_TO_REVIEW;
 import static ru.practicum.ewm.requests.enums.RequestStatus.CONFIRMED;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -80,6 +83,7 @@ public class EventService {
         event.setLocation(location);
         event.setCreatedOn(LocalDateTime.now());
         event.setState(PENDING);
+        log.info("Event add" + event);
         return EventMapper.toEventFullDto(eventRepository.save(event), 0L);
     }
 
@@ -129,6 +133,7 @@ public class EventService {
                 event.setState(State.CANCELED);
             }
         }
+        log.info("Event update by Owner" + event);
         return EventMapper.toEventFullDto(eventRepository.save(event),
                 requestRepository.countByEventIdAndStatus(eventId, CONFIRMED));
     }
@@ -182,6 +187,7 @@ public class EventService {
         if (title != null && !title.isBlank()) {
             event.setTitle(title);
         }
+        log.info("Event update by Admin" + event);
         return EventMapper.toEventFullDto(eventRepository.save(event),
                 requestRepository.countByEventIdAndStatus(eventId, CONFIRMED));
     }
@@ -193,6 +199,7 @@ public class EventService {
         Map<Long, Long> confirmedRequests = requestRepository.findAllByEventIdInAndStatus(ids, CONFIRMED)
                 .stream()
                 .collect(Collectors.toMap(ConfirmedRequests::getEvent, ConfirmedRequests::getCount));
+        log.info("getEventsByOwner");
         return events.stream()
                 .map(event -> EventMapper.toEventShortDto(event, confirmedRequests.getOrDefault(event.getId(), 0L)))
                 .collect(Collectors.toList());
@@ -200,6 +207,7 @@ public class EventService {
 
     @Transactional(readOnly = true)
     public EventFullDto getEventByOwner(Long userId, Long eventId) {
+        log.info("getEventByOwner ");
         return EventMapper.toEventFullDto(getEvent(eventId, userId),
                 requestRepository.countByEventIdAndStatus(eventId, CONFIRMED));
     }
@@ -257,6 +265,7 @@ public class EventService {
                         confirmedRequests.getOrDefault(event.getId(), 0L)));
             }
         }
+        log.info("get Events  by Admin");
         return result;
     }
 
@@ -265,7 +274,7 @@ public class EventService {
                                                   LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from,
                                                   Integer size, HttpServletRequest request) {
         if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
-            throw new ValidationException("START can't ba after END.");
+            throw new BadRequestException("START can't be after END.");
         }
         Specification<Event> specification = Specification.where(null);
         if (text != null) {
@@ -335,21 +344,17 @@ public class EventService {
                         confirmedRequests.getOrDefault(event.getId(), 0L)));
             }
         }
-//        String requestURI = request.getURI().getPath();
-//        String remoteAddr = request.getRemoteAddress().getAddress().getHostAddress();
         EndpointHitDto hit = new EndpointHitDto(app, request.getRequestURI(), request.getRemoteAddr(),
                 LocalDateTime.now());
-//        EndpointHitDto hit = new EndpointHitDto(app, requestURI, remoteAddr,
-//                LocalDateTime.now());
         statsClient.saveHit(hit);
+
+        log.info("get Events");
         return result;
     }
 
     @Transactional(readOnly = true)
     public EventFullDtoWithViews getEventById(Long eventId, HttpServletRequest request) {
         Event event = getEvent(eventId);
-//        String requestURI = request.getURI().getPath();
-//        String remoteAddr = request.getRemoteAddress().getAddress().getHostAddress();
         if (event.getState() != PUBLISHED) {
             throw new NotFoundException("Event must be published.");
         }
@@ -366,11 +371,10 @@ public class EventService {
             result = EventMapper.toEventFullDtoWithViews(event, 0L,
                     requestRepository.countByEventIdAndStatus(eventId, CONFIRMED));
         }
-//        EndpointHitDto hit = new EndpointHitDto(app, requestURI, remoteAddr,
-//                LocalDateTime.now());
         EndpointHitDto hit = new EndpointHitDto(app, request.getRequestURI(), request.getRemoteAddr(),
                 LocalDateTime.now());
         statsClient.saveHit(hit);
+        log.info("get Event by id {} ", eventId);
         return result;
     }
 

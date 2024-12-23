@@ -1,6 +1,7 @@
 package ru.practicum.ewm.compilations;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 import static ru.practicum.ewm.requests.enums.RequestStatus.CONFIRMED;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -34,6 +36,7 @@ public class CompilationService {
     public CompilationDto addCompilation(NewCompilationDto newCompilationDto) {
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDto);
         setEvents(compilation, newCompilationDto.getEvents());
+        log.info("addCompilation: {}", compilation);
         return buildCompilationDto(compilation);
     }
 
@@ -55,10 +58,9 @@ public class CompilationService {
         if (title != null && !title.isBlank()) {
             compilation.setTitle(title);
         }
+        log.info("updateCompilation: {}", compilation);
         return buildCompilationDto(compilation);
     }
-
-
 
 
     @Transactional(readOnly = true)
@@ -92,6 +94,7 @@ public class CompilationService {
 
             result.add(compilationDto);
         }
+        log.info("getCompilations");
         return result;
     }
 
@@ -108,11 +111,13 @@ public class CompilationService {
                     .map(event -> EventMapper.toEventShortDto(event, confirmedRequests.get(event.getId())))
                     .collect(Collectors.toList()));
         }
+        log.info("getCompilationById: {}", compilationDto);
         return compilationDto;
     }
 
     public void deleteCompilation(Long compilationId) {
         getCompilation(compilationId);
+        log.info("deleteCompilation: {}", compilationId);
         compilationRepository.deleteById(compilationId);
     }
 
