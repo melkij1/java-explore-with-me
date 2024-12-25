@@ -31,7 +31,7 @@ import static ru.practicum.ewm.requests.enums.RequestStatus.PENDING;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class RequestServiceImpl implements RequestService{
+public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;

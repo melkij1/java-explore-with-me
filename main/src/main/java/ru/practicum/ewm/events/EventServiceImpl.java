@@ -58,7 +58,7 @@ import static ru.practicum.ewm.requests.enums.RequestStatus.CONFIRMED;
 @RequiredArgsConstructor
 @Transactional
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EventServiceImpl implements EventService{
+public class EventServiceImpl implements EventService {
     final EventRepository eventRepository;
     final UserRepository userRepository;
     final CategoryRepository categoryRepository;
