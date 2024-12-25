@@ -2,6 +2,7 @@ package ru.practicum.ewm.locations;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Getter
@@ -10,17 +11,18 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "locations")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Location {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
     @Column(nullable = false)
-    private Float lat;
+    Float lat;
 
     @Column(nullable = false)
-    private Float lon;
+    Float lon;
 
     public Location(Float lat, Float lon) {
         this.lat = lat;

@@ -2,6 +2,7 @@ package ru.practicum.ewm.compilations;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.ewm.events.Event;
 
 import java.util.Set;
@@ -12,24 +13,25 @@ import java.util.Set;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "compilations")
 public class Compilation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
     @Column(nullable = false)
-    private String title;
+    String title;
 
-    private Boolean pinned;
+    Boolean pinned;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "compilation_event",
             joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))
     @ToString.Exclude
-    private Set<Event> events;
+    Set<Event> events;
 
     public Compilation(String title, Boolean pinned) {
         this.title = title;

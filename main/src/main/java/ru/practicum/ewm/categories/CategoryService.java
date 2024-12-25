@@ -1,58 +1,18 @@
 package ru.practicum.ewm.categories;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.categories.dto.CategoryDto;
 import ru.practicum.ewm.categories.dto.NewCategoryDto;
-import ru.practicum.ewm.exceptions.NotFoundException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Slf4j
-@Service
-@RequiredArgsConstructor
-@Transactional
-public class CategoryService {
-    private final CategoryRepository categoryRepository;
+public interface CategoryService {
+    CategoryDto addCategory(NewCategoryDto newCategoryDto);
 
-    public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
-        log.info("Add category: {}", newCategoryDto);
-        return CategoryMapper.toCategoryDto(categoryRepository.save(CategoryMapper.toCategory(newCategoryDto)));
-    }
+    CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto);
 
-    public CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto) {
-        Category category = getCategory(categoryId);
-        category.setName(categoryDto.getName());
-        log.info("Update category: {}", category);
-        return CategoryMapper.toCategoryDto(categoryRepository.save(category));
-    }
+    List<CategoryDto> getAllCategories(Integer from, Integer size);
 
-    @Transactional(readOnly = true)
-    public List<CategoryDto> getAllCategories(Integer from, Integer size) {
-        log.info("Get all categories");
-        return categoryRepository.findAll(PageRequest.of(from / size, size)).stream()
-                .map(CategoryMapper::toCategoryDto).collect(Collectors.toList());
-    }
+    CategoryDto getCategoryById(Long id);
 
-    @Transactional(readOnly = true)
-    public CategoryDto getCategoryById(Long id) {
-        log.info("Get category by id: {}", id);
-        return CategoryMapper.toCategoryDto(getCategory(id));
-    }
-
-    public void deleteCategory(Long categoryId) {
-        if (!categoryRepository.existsById(categoryId)) {
-            throw new NotFoundException("Category with id=" + categoryId + " was not found");
-        }
-        categoryRepository.deleteById(categoryId);
-    }
-
-    private Category getCategory(Long categoryId) {
-        return categoryRepository.findById(categoryId).orElseThrow(() ->
-                new NotFoundException("Category with id=" + categoryId + " was not found"));
-    }
+    void deleteCategory(Long categoryId);
 }

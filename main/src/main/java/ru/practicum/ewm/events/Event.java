@@ -30,6 +30,7 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
+    @ToString.Exclude
     Category category;
 
     @Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP")
@@ -43,10 +44,12 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "initiator_id", nullable = false)
+    @ToString.Exclude
     User initiator;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
+    @ToString.Exclude
     Location location;
 
     Boolean paid;
