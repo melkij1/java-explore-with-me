@@ -21,11 +21,13 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
+    @Override
     public UserDto addUser(UserNewDto userNewDto) {
         log.info("addUser");
         return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userNewDto)));
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<UserDto> getUsers(List<Long> userIds, Integer from, Integer size) {
         Pageable pageable = PageRequest.of(from / size, size);
@@ -40,6 +42,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
     public void deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("User with id=" + userId + " was not found");

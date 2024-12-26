@@ -69,6 +69,7 @@ public class EventServiceImpl implements EventService {
     @Value("${app}")
     String app;
 
+    @Override
     public EventFullDto addEvent(Long userId, EventNewDto eventNewDto) {
         checkActualTime(eventNewDto.getEventDate());
         User user = userRepository.findById(userId).orElseThrow(() ->
@@ -87,6 +88,7 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventFullDto(eventRepository.save(event), 0L);
     }
 
+    @Override
     public EventFullDto updateEventByOwner(Long userId, Long eventId, EventUpdateUserDto updateEvent) {
         Event event = getEvent(eventId, userId);
         if (event.getState() == PUBLISHED) {
@@ -138,6 +140,7 @@ public class EventServiceImpl implements EventService {
                 requestRepository.countByEventIdAndStatus(eventId, CONFIRMED));
     }
 
+    @Override
     public EventFullDto updateEventByAdmin(Long eventId, EventUpdateAdminDto updateEvent) {
         Event event = getEvent(eventId);
         if (updateEvent.getStateAction() != null) {
@@ -192,6 +195,7 @@ public class EventServiceImpl implements EventService {
                 requestRepository.countByEventIdAndStatus(eventId, CONFIRMED));
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<EventShortDto> getEventsByOwner(Long userId, Integer from, Integer size) {
         List<Event> events = eventRepository.findAllByInitiatorId(userId, PageRequest.of(from / size, size));
@@ -205,6 +209,7 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public EventFullDto getEventByOwner(Long userId, Long eventId) {
         log.info("getEventByOwner ");
@@ -212,6 +217,7 @@ public class EventServiceImpl implements EventService {
                 requestRepository.countByEventIdAndStatus(eventId, CONFIRMED));
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<EventFullDtoWithViews> getEventsByAdminParams(List<Long> users, List<String> states, List<Long> categories,
                                                               LocalDateTime rangeStart, LocalDateTime rangeEnd,
@@ -269,6 +275,7 @@ public class EventServiceImpl implements EventService {
         return result;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<EventShortDtoWithViews> getEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
                                                   LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from,
@@ -352,6 +359,7 @@ public class EventServiceImpl implements EventService {
         return result;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public EventFullDtoWithViews getEventById(Long eventId, HttpServletRequest request) {
         Event event = getEvent(eventId);

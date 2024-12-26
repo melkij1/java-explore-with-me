@@ -19,11 +19,13 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
+    @Override
     public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
         log.info("Add category: {}", newCategoryDto);
         return CategoryMapper.toCategoryDto(categoryRepository.save(CategoryMapper.toCategory(newCategoryDto)));
     }
 
+    @Override
     public CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto) {
         Category category = getCategory(categoryId);
         category.setName(categoryDto.getName());
@@ -31,6 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<CategoryDto> getAllCategories(Integer from, Integer size) {
         log.info("Get all categories");
@@ -38,12 +41,14 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(CategoryMapper::toCategoryDto).collect(Collectors.toList());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public CategoryDto getCategoryById(Long id) {
         log.info("Get category by id: {}", id);
         return CategoryMapper.toCategoryDto(getCategory(id));
     }
 
+    @Override
     public void deleteCategory(Long categoryId) {
         if (!categoryRepository.existsById(categoryId)) {
             throw new NotFoundException("Category with id=" + categoryId + " was not found");

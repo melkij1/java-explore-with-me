@@ -36,6 +36,7 @@ public class RequestServiceImpl implements RequestService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
 
+    @Override
     public RequestDto addRequest(Long userId, Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
@@ -67,6 +68,7 @@ public class RequestServiceImpl implements RequestService {
         return RequestMapper.toRequestDto(requestRepository.save(request));
     }
 
+    @Override
     public EventRequestStatusUpdateResult updateRequestsStatus(Long userId, Long eventId,
                                                                EventRequestStatusUpdateRequest statusUpdateRequest) {
         User initiator = getUser(userId);
@@ -102,6 +104,7 @@ public class RequestServiceImpl implements RequestService {
         return new EventRequestStatusUpdateResult(confirmed, rejected);
     }
 
+    @Override
     public RequestDto cancelRequest(Long userId, Long requestId) {
         Request request = requestRepository.findByIdAndRequesterId(requestId, userId);
         request.setStatus(RequestStatus.CANCELED);
@@ -109,6 +112,7 @@ public class RequestServiceImpl implements RequestService {
         return RequestMapper.toRequestDto(requestRepository.save(request));
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<RequestDto> getRequestsByEventOwner(Long userId, Long eventId) {
         checkUser(userId);
@@ -119,6 +123,7 @@ public class RequestServiceImpl implements RequestService {
                 .map(RequestMapper::toRequestDto).collect(Collectors.toList());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<RequestDto> getRequestsByUser(Long userId) {
         checkUser(userId);
